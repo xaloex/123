@@ -1,5 +1,5 @@
 --[[
-	2ww UI  |  v1.0.0
+	2ww UI  |  v1.0.02
 	LocalScript / executor script
 
 	- Tabs: Main, Config, Info
@@ -1504,6 +1504,7 @@ end
 Functions = LoadModule("2ww/functions.lua", {
 	SilentEnabled = true,
 	Prediction = true,
+	TeamCheck = false,
 	Wallbang = false,
 	WallbangDist = 15,
 	HitChance = 1.0,
@@ -1536,9 +1537,10 @@ do
 			end)
 		end)
 	end)
-	-- start ESP + autopick render loops
+	-- start ESP + autopick render loops + silent aim (hook + autoshoot)
 	pcall(function() if ESP and ESP.Start then ESP.Start() end end)
 	pcall(function() if AutoPickGun and AutoPickGun.Start then AutoPickGun.Start() end end)
+	pcall(function() if Functions and Functions.Start then Functions.Start() end end)
 end
 
 local MainTab = CreateTab("Main", "Functions", "top")
@@ -1563,6 +1565,8 @@ do
 				Callback = function(v) Functions.Config.ShootDelay = v / 1000 end })
 			sub:Toggle({ Name = "Auto Shoot", Flag = "fn_autoshoot", Default = Functions.Config.AutoShoot == true,
 				Callback = function(v) Functions.Config.AutoShoot = v end })
+			sub:Toggle({ Name = "Team Check", Flag = "fn_team", Default = Functions.Config.TeamCheck == true,
+				Callback = function(v) Functions.Config.TeamCheck = v end })
 			sub:Toggle({ Name = "Wallbang", Flag = "fn_wallbang", Default = Functions.Config.Wallbang == true,
 				Callback = function(v) Functions.Config.Wallbang = v end })
 			sub:Slider({ Name = "Wallbang Dist", Flag = "fn_wbdist", Min = 3, Max = 100, Default = Functions.Config.WallbangDist or 15,
@@ -1876,6 +1880,7 @@ function Promixity:Unload(silent)
 	Tween(HUD, 0.25, { GroupTransparency = 1 })
 	pcall(function() if ESP and ESP.Destroy then ESP.Destroy() elseif ESP and ESP.Stop then ESP.Stop() end end)
 	pcall(function() if AutoPickGun and AutoPickGun.Stop then AutoPickGun.Stop() end end)
+	pcall(function() if Functions and Functions.Stop then Functions.Stop() end end)
 	pcall(function()
 		if Functions and Functions.GetFOVCircle then
 			local c = Functions.GetFOVCircle()
